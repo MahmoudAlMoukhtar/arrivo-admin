@@ -9,7 +9,7 @@ import {
   Button,
   InputGroup
 } from 'react-bootstrap';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import ProductList from './ProductList';
@@ -19,7 +19,7 @@ import CartModal from '../cart/CartModal';
 import usePagination from 'hooks/usePagination';
 import Flex from 'components/common/Flex';
 
-const Products = () => {
+const Products = ({ setCopiedProduct, edit, setEdit }) => {
   const {
     productsState: { products },
     productsDispatch
@@ -68,7 +68,7 @@ const Products = () => {
   }, []);
 
   return (
-    <>
+    <React.Fragment>
       <Card className="mb-3">
         <Card.Body>
           <Row className="flex-between-center">
@@ -128,7 +128,7 @@ const Products = () => {
                     </Col>
                   </Form>
                 </Col>
-                <Col xs="auto" className="pe-0">
+                {/* <Col xs="auto" className="pe-0">
                   <OverlayTrigger
                     placement="top"
                     overlay={
@@ -148,7 +148,7 @@ const Products = () => {
                       />
                     </Link>
                   </OverlayTrigger>
-                </Col>
+                </Col> */}
               </Row>
             </Col>
           </Row>
@@ -168,7 +168,14 @@ const Products = () => {
           >
             {paginatedProducts.map((product, index) =>
               layout === 'list' ? (
-                <ProductList product={product} key={product.id} index={index} />
+                <ProductList
+                  edit={edit}
+                  setEdit={setEdit}
+                  setCopiedProduct={setCopiedProduct}
+                  product={product}
+                  key={product.id}
+                  index={index}
+                />
               ) : (
                 <ProductGrid
                   product={product}
@@ -246,7 +253,7 @@ const Products = () => {
         </Card.Footer>
       </Card>
       <CartModal />
-    </>
+    </React.Fragment>
   );
 };
 

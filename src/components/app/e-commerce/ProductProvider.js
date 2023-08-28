@@ -1,13 +1,15 @@
-import React, { useReducer } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ProductContext } from 'context/Context';
 import { productData } from 'data/ecommerce/productData';
 import { productReducer } from 'reducers/productReducer';
-
+import { collection, getDocs, getFirestore } from 'firebase/firestore';
+import app from '../../../firebase';
 const ProductProvider = ({ children }) => {
+  const [trips, setTrips] = useState([]);
   const initData = {
-    initProducts: productData,
-    products: productData,
+    initProducts: trips,
+    products: trips,
     cartItems: [
       {
         ...productData[0],
@@ -41,6 +43,22 @@ const ProductProvider = ({ children }) => {
     !!productsState.favouriteItems.find(
       favouriteItem => favouriteItem.id === id
     );
+
+  useEffect(() => {
+    async function fetchListContent() {
+      const db = getFirestore(app);
+      const querySnapshot = await getDocs(collection(db, 'trips'));
+      const listTrips = querySnapshot.docs.map(doc => doc.data());
+      setTrips(listTrips);
+      productsDispatch({
+        type: 'SORT_PRODUCT',
+        payload: { sortBy: 'name', order: 'asc' }
+      });
+      productsDispatch({ type: 'RESET' });
+      productsDispatch({ type: 'ADD_INIT_PRODUCTS', payload: listTrips });
+    }
+    fetchListContent();
+  }, []);
 
   return (
     <ProductContext.Provider

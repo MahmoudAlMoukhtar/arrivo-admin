@@ -13,20 +13,38 @@ import { useFieldArray, useFormContext } from 'react-hook-form';
 import 'react-datepicker/dist/react-datepicker.css';
 import DatePicker from 'react-datepicker';
 import Flex from 'components/common/Flex';
+import { Timestamp } from 'firebase/firestore';
 
 const ProductPricing = () => {
+  const {
+    control,
+    register,
+    setValue,
+    watch,
+    formState: { errors }
+  } = useFormContext();
+  let initPackages = watch('tripPackages') || [];
+
+  const [packages, setPackages] = useState(initPackages);
   const date = new Date();
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(
     new Date(date.setDate(date.getDate() + 7))
   );
   const [releaseDate, setReleaseDate] = useState(startDate);
-  const [packages, setPackages] = useState([]);
+
+  const { append } = useFieldArray({
+    control,
+    name: 'tripPackages'
+  });
+
+  const { regularPrice } = watch();
 
   const onChange = dates => {
     const [start, end] = dates;
     setStartDate(start);
     setEndDate(end);
+
     const diffInDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
     const release = new Date(
       start.getTime() + diffInDays * 24 * 60 * 60 * 1000
@@ -40,99 +58,127 @@ const ProductPricing = () => {
     setPackages(newPackages);
   }
 
-  const packagesByMonth = {};
+  const packagesByPersons = {};
   packages.forEach(p => {
-    const month = p.startDate.getMonth() + 1;
-    if (!packagesByMonth[month]) {
-      packagesByMonth[month] = [];
+    const persons = p.personsCount;
+    if (!packagesByPersons[persons]) {
+      packagesByPersons[persons] = [];
     }
-    packagesByMonth[month].push(p);
+    let startDateStr = '';
+    let endDateStr = '';
+    // Check if startDate and endDate are Firestore Timestamp objects
+    const isStartDateTimestamp = p.startDate instanceof Timestamp;
+    const isEndDateTimestamp = p.endDate instanceof Timestamp;
+
+    if (isStartDateTimestamp && isEndDateTimestamp) {
+      // Convert start and end timestamps to Date objects
+      const startDateObj = p.startDate.toDate();
+      const endDateObj = p.endDate.toDate();
+
+      // Format dates as strings
+      startDateStr = startDateObj.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
+      });
+      endDateStr = endDateObj.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
+      });
+    } else {
+      // startDate and/or endDate is not a Firestore Timestamp object
+      // Assume they are already in the desired format
+      startDateStr = p.startDate.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
+      });
+      endDateStr = p.endDate.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+    packagesByPersons[persons].push({
+      ...p,
+      startDate: startDateStr,
+      endDate: endDateStr
+    });
   });
-
-  const {
-    control,
-    register,
-    setValue,
-    watch,
-    formState: { errors }
-  } = useFormContext();
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'tripPackages'
-  });
-
-  const { regularPrice } = watch();
-
-  //register('packages');
 
   return (
-    <Card className="mt-3">
+    <Card
+      className={`mt-3 ${errors.tripPackages ? 'border border-danger' : ''}`}
+    >
       <Card.Header as="h6" className="bg-light fs-1">
-        Pricing Packages
+        بكجات الأسعار
       </Card.Header>
       <hr />
-      {Object.entries(packagesByMonth).map(([month, packages]) => (
-        <div key={month} style={{ padding: '10px' }}>
-          <h5>Month {month}</h5>
-          {packages.map((p, index) => (
-            <Row key={index} className="gx-2 flex-between-center mb-3">
-              <Col sm={3}>
-                <h6 className="mb-0 text-600">
-                  {p.startDate.toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric'
-                  })}{' '}
-                  -{' '}
-                  {p.endDate.toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric'
-                  })}
-                </h6>
-              </Col>
-              <Col sm={9}>
-                <Flex
-                  justifyContent="between"
-                  alignItems="center"
-                  padding="10px"
-                  flexDirection="column"
-                >
-                  <h6 className="mb-0 text-700">
-                    Price:{p.finalPrice} {watch('currency')}
+      {Object.entries(packagesByPersons).map(([persons, packages]) => (
+        <div key={persons} style={{ padding: '10px' }}>
+          <h5>
+            {persons > 2 ? `${persons} أشخاص` : persons == 2 ? 'شخصين' : 'شخص'}
+          </h5>
+          {packages.map((p, index) => {
+            return (
+              <Row key={index} className="gx-2 flex-between-center mb-3">
+                <Col sm={3}>
+                  <h6 className="mb-0 text-600">
+                    {p.startDate} - {p.endDate}
                   </h6>
-                  <h6 className="mb-0 text-700">
-                    Discount: {p.discountPercentage}%
-                  </h6>
-                  <h6 className="mb-0 text-700">Persons: {p.personsCount}</h6>
-                  <Button
-                    variant="link"
-                    to="#!"
-                    type="button"
-                    className="text-danger"
-                    size="sm"
-                    onClick={() => removePackage(index)}
+                </Col>
+                <Col sm={9}>
+                  <Flex
+                    justifyContent="between"
+                    alignItems="center"
+                    padding="10px"
+                    flexDirection="column"
                   >
-                    <FontAwesomeIcon className="fs--1" icon="trash-alt" />
-                  </Button>
-                </Flex>
-              </Col>
-            </Row>
-          ))}
+                    <h6 className="mb-0 text-700">
+                      Price:{p.finalPrice} {watch('currency')}
+                    </h6>
+                    <h6 className="mb-0 text-700">
+                      Discount: {p.discountPercentage}%
+                    </h6>
+                    <h6 className="mb-0 text-700">Persons: {p.personsCount}</h6>
+                    <Button
+                      variant="link"
+                      to="#!"
+                      type="button"
+                      className="text-danger"
+                      size="sm"
+                      onClick={() => removePackage(index)}
+                    >
+                      <FontAwesomeIcon className="fs--1" icon="trash-alt" />
+                    </Button>
+                  </Flex>
+                </Col>
+              </Row>
+            );
+          })}
+          <hr />
         </div>
       ))}
-      <hr />
       <Card.Body>
         <Row className="gx-2 gy-3">
+          <Col md="12" className="mb-3">
+            <Form.Group controlId="personsCount">
+              <Form.Label>عدد الأشخاص:</Form.Label>
+              <Form.Control
+                type="number"
+                name="personsCount"
+                {...register('personsCount')}
+              />
+            </Form.Group>
+          </Col>
           <Col xs="8">
             <Form.Group controlId="regularPrice">
               <Form.Label>
-                Base Price:
+                السعر الأساسي:
                 <OverlayTrigger
                   overlay={
                     <Tooltip
                       style={{ position: 'fixed' }}
                       id="basePriceTooltip"
                     >
-                      Product regular price
+                      سعر الرحلة العادي
                     </Tooltip>
                   }
                 >
@@ -168,7 +214,7 @@ const ProductPricing = () => {
 
           <Col md="12" className="mb-3">
             <Form.Group controlId="discountPercentage">
-              <Form.Label>Discount in percentage:</Form.Label>
+              <Form.Label>الخصم بالنسبة المئوية:</Form.Label>
               <Form.Control
                 type="text"
                 name="discountPercentage"
@@ -185,19 +231,10 @@ const ProductPricing = () => {
               />
             </Form.Group>
           </Col>
-          <Col md="6" className="mb-3">
-            <Form.Group controlId="personsCount">
-              <Form.Label>Persons Count:</Form.Label>
-              <Form.Control
-                type="number"
-                name="personsCount"
-                {...register('personsCount')}
-              />
-            </Form.Group>
-          </Col>
+
           <Col xs="6">
             <Form.Group controlId="releaseDate">
-              <Form.Label>Release Date:</Form.Label>
+              <Form.Label>تاريخ التوفر من والى:</Form.Label>
               <DatePicker
                 selected={startDate}
                 onChange={onChange}
@@ -208,7 +245,7 @@ const ProductPricing = () => {
                 className="form-control"
                 renderExtraHeader={() => (
                   <div>
-                    Release Date:{' '}
+                    تاريخ التوفر:{' '}
                     {releaseDate.toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric'
@@ -218,17 +255,17 @@ const ProductPricing = () => {
               />
             </Form.Group>
           </Col>
-          <Col xs="12">
+          <Col xs="6">
             <Form.Group controlId="finalPrice">
               <Form.Label>
-                Final price:
+                السعر النهائي بعد حساب الخصم:
                 <OverlayTrigger
                   overlay={
                     <Tooltip
                       style={{ position: 'fixed' }}
                       id="finalPriceTooltip"
                     >
-                      Product final price
+                      *سعر الرحلة النهائي/تأكد من تطبيق الخصم
                     </Tooltip>
                   }
                 >
@@ -264,7 +301,7 @@ const ProductPricing = () => {
                 append(currentPackage);
               }}
             >
-              Add Package
+              إضافة البكج
             </Button>
           </Col>
         </Row>
@@ -274,38 +311,3 @@ const ProductPricing = () => {
 };
 
 export default ProductPricing;
-/* 
-const onChange = dates => {
-    const [start, end] = dates;
-    setStartDate(start);
-    setEndDate(end);
-    const diffInDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)); // calculate the difference in days and round up
-    const release = new Date(
-      start.getTime() + diffInDays * 24 * 60 * 60 * 1000
-    ); // add the difference in days to the start date
-    setReleaseDate(release);
-    setValue('releaseDate', release); // register the release date in the form state
-  };
-
-  <Form.Group controlId="releaseDate">
-              <Form.Label>Release Date:</Form.Label>
-              <DatePicker
-                selected={startDate}
-                onChange={onChange}
-                startDate={startDate}
-                endDate={endDate}
-                selectsRange
-                dateFormat="MMM dd"
-                className="form-control"
-                renderExtraHeader={() => (
-                  <div>
-                    Release Date:{' '}
-                    {releaseDate.toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric'
-                    })}
-                  </div>
-                )}
-              />
-            </Form.Group>
-*/

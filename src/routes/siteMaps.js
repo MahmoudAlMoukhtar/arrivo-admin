@@ -167,6 +167,27 @@ export const appRoutes = {
           ]
         },
         {
+          name: 'Trip precooked',
+          active: true,
+          children: [
+            {
+              name: 'content list',
+              to: 'e-commerce/trip-content/trip-content-list',
+              active: true
+            },
+            {
+              name: 'places list',
+              to: 'e-commerce/trip-places/trip-places-list',
+              active: true
+            },
+            {
+              name: 'Accommodation list',
+              to: 'e-commerce/trip-accommodation/trip-accommodation-list',
+              active: true
+            }
+          ]
+        },
+        {
           name: 'Customers',
           to: '/e-commerce/customers',
           active: true

@@ -1,19 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MultiSelect from 'components/common/MultiSelect';
-import {
-  Card,
-  Col,
-  Form,
-  Row,
-  InputGroup,
-  FormControl,
-  Button
-} from 'react-bootstrap';
+import { Card, Col, Form, Row } from 'react-bootstrap';
 import { Controller, useFormContext } from 'react-hook-form';
-
+import { collection, getDocs, getFirestore } from 'firebase/firestore';
+import app from '../../../../../firebase';
 const ProductListContent = () => {
-  const { control } = useFormContext();
-  const tagOptions = [
+  const [listContent, setListContent] = useState([]);
+  const {
+    control,
+    formState: { errors }
+  } = useFormContext();
+
+  useEffect(() => {
+    async function fetchListContent() {
+      const db = getFirestore(app);
+      const querySnapshot = await getDocs(collection(db, 'listContent'));
+      const listContent = querySnapshot.docs.map(doc => doc.data());
+      setListContent(listContent);
+    }
+    fetchListContent();
+  }, []);
+
+  let tagOptions = [
     { value: 'دير سوميلا', label: 'دير سوميلا' },
     { value: 'مغار شال', label: 'مغار شال' },
     { value: 'مرتفعات سلطان مراد', label: 'مرتفعات سلطان مراد' },
@@ -24,26 +32,22 @@ const ProductListContent = () => {
     { value: 'شلال بولفيت', label: 'شلال بولفيت' }
   ];
 
-  const [tagInput, setTagInput] = useState('');
-  const [selectedTags, setSelectedTags] = useState([]);
-
-  const handleAddTag = () => {
-    if (tagInput !== '' && !selectedTags.some(tag => tag.label === tagInput)) {
-      setSelectedTags([...selectedTags, { value: tagInput, label: tagInput }]);
-      setTagInput('');
-    }
-  };
+  tagOptions = listContent.map(c => {
+    return { value: c.title, label: c.title, ...c };
+  });
 
   return (
     <Card className="mb-3">
       <Card.Header as="h6" className="bg-light">
-        Trip Conetnt:
+        محتويات الرحلة:
       </Card.Header>
       <Card.Body>
         <Row className="gx-2 gy-3">
           <Col xs="12">
             <Form.Group>
-              <Form.Label>Add a keyword:</Form.Label>
+              <Form.Label>
+                إضافة المحتويات:<span className="text-danger">*</span>
+              </Form.Label>
               <div className="d-flex flex-column gap-2">
                 <Controller
                   name="tripListContent"
@@ -55,24 +59,13 @@ const ProductListContent = () => {
                       isMulti
                       options={tagOptions}
                       onChange={selectedOptions => {
-                        setSelectedTags(selectedOptions);
                         field.onChange(selectedOptions);
                       }}
-                      value={selectedTags}
+                      className={errors.tripListContent ? 'is-invalid' : ''}
                     />
                   )}
                   control={control}
                 />
-                <InputGroup className="">
-                  <FormControl
-                    placeholder="Enter a Item Content"
-                    value={tagInput}
-                    onChange={e => setTagInput(e.target.value)}
-                  />
-                  <Button variant="primary" onClick={handleAddTag}>
-                    Add Item Content
-                  </Button>
-                </InputGroup>
               </div>
             </Form.Group>
           </Col>

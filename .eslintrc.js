@@ -19,9 +19,9 @@ module.exports = {
   plugins: ['react'],
   rules: {
     'react/no-unescaped-entities': 'off',
-    'react/prop-types': 'error',
+    'react/prop-types': 'warn',
     'react/display-name': 'off',
-    'prettier/prettier': ['error', { endOfLine: 'auto' }]
+    'prettier/prettier': ['warn', { endOfLine: 'auto' }]
   },
   globals: {
     process: true

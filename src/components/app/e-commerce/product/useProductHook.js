@@ -46,7 +46,16 @@ const useProductHook = product => {
       payload: { product }
     });
   };
-  return { handleAddToCart, handleFavouriteClick };
+
+  // const handleCopyProduct = product => {
+  //   setCopiedProduct(product);
+  // };
+  return {
+    handleAddToCart,
+    handleFavouriteClick
+    // handleCopyProduct,
+    // copiedProduct
+  };
 };
 
 export default useProductHook;

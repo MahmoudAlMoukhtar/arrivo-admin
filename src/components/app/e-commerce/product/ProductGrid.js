@@ -6,23 +6,24 @@ import { Button, Col, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import classNames from 'classnames';
 import { ProductContext } from 'context/Context';
 import useProductHook from './useProductHook';
-import ProductImage from './ProductImage';
 import StarRating from 'components/common/StarRating';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { ProductSingleImage } from './ProductImage';
 
 const ProductGrid = ({ product, ...rest }) => {
   const {
-    name,
-    category,
+    productName: name,
+    tripCategory: category,
     id,
-    price,
+    tripPackages,
     salePrice,
     shippingCost,
-    rating,
-    totalReview,
+    productSummery,
+    // rating,
+    // totalReview,
     isInStock,
-    isNew,
-    files
+    // isNew,
+    thumTripImge: file
   } = product;
 
   const { isInFavouriteItems } = useContext(ProductContext);
@@ -36,12 +37,11 @@ const ProductGrid = ({ product, ...rest }) => {
         className="border rounded-1 h-100 pb-3"
       >
         <div className="overflow-hidden">
-          <ProductImage
-            name={name}
+          <ProductSingleImage
             id={id}
-            isNew={isNew}
-            files={files}
-            layout="grid"
+            image={file}
+            name={name}
+            layout={'grid'}
           />
           <div className="p-3">
             <h5 className="fs-0">
@@ -52,14 +52,26 @@ const ProductGrid = ({ product, ...rest }) => {
                 {name}
               </Link>
             </h5>
+            <h5 className="fs-0">
+              <Link
+                className="text-dark"
+                to={`/e-commerce/product/product-details/${id}`}
+              >
+                {productSummery}
+              </Link>
+            </h5>
             <p className="fs--1 mb-3">
               <Link to="#!" className="text-500">
                 {category}
               </Link>
             </p>
             <h5 className="fs-md-2 text-warning mb-0 d-flex align-items-center mb-3">
-              {`$${salePrice ? salePrice : price}`}
-              {salePrice && <del className="ms-2 fs--1 text-500">${price}</del>}
+              {`$${salePrice ? salePrice : tripPackages[0].finalPrice}`}
+              {salePrice && (
+                <del className="ms-2 fs--1 text-500">
+                  ${tripPackages[0].finalPrice}
+                </del>
+              )}
             </h5>
             <p className="fs--1 mb-1">
               Shipping Cost: <strong>${shippingCost}</strong>
@@ -79,8 +91,8 @@ const ProductGrid = ({ product, ...rest }) => {
         </div>
         <Flex alignItems="center" className="px-3">
           <div className="flex-1">
-            <StarRating readonly rating={rating} />
-            <span className="ms-1">({totalReview})</span>
+            <StarRating readonly rating={4.5} />
+            <span className="ms-1">({4.5})</span>
           </div>
           <OverlayTrigger
             placement="top"
@@ -121,19 +133,22 @@ const ProductGrid = ({ product, ...rest }) => {
 
 ProductGrid.propTypes = {
   product: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    category: PropTypes.string.isRequired,
+    productName: PropTypes.string.isRequired,
+    productSummery: PropTypes.string.isRequired,
+    tripCategory: PropTypes.string.isRequired,
+    thumTripImge: PropTypes.string.isRequired,
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     features: PropTypes.array,
-    price: PropTypes.number.isRequired,
+    tripPackages: PropTypes.array,
+    // price: PropTypes.number.isRequired,
     discount: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     salePrice: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     shippingCost: PropTypes.number,
     rating: PropTypes.number,
     totalReview: PropTypes.number,
     isInStock: PropTypes.bool,
-    isNew: PropTypes.bool,
-    files: PropTypes.arrayOf(PropTypes.object).isRequired
+    isNew: PropTypes.bool
+    //files: PropTypes.arrayOf(PropTypes.object).isRequired
   })
 };
 

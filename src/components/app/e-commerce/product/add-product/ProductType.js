@@ -1,29 +1,51 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, Col, Form, Row } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
+import PropTypes from 'prop-types';
 
-const ProductType = () => {
+const ProductType = ({ setTripType }) => {
   const {
+    setValue,
     register,
-    formState: { errors }
+    formState: { errors },
+    watch
   } = useFormContext();
+
+  const [customInput, setCustomInput] = useState('');
+  const [selectCategory, setselectCategory] = useState(watch('tripCategory'));
+
+  // const handleCustomCategory = () => {
+  //   if (customInput !== '' && !selectCategory !== customInput) {
+  //     setselectCategory(customInput);
+  //     setCustomInput('');
+  //   }
+  // };
+
   return (
     <Card className="mb-3">
       <Card.Header as="h6" className="bg-light">
-        Type
+        نوع الرحلة
       </Card.Header>
       <Card.Body>
         <Row className="gx-2 gy-3">
           <Col md="12">
             <Form.Group>
-              <Form.Label>Select category:</Form.Label>
+              <Form.Label>
+                اختار النوع:
+                <span className="text-danger">*</span>
+              </Form.Label>
               <Form.Select
-                {...register(`productCategory`)}
-                isInvalid={!!errors.productCategory}
+                {...register(`tripType`)}
+                isInvalid={!!errors.tripType}
+                onChange={e => {
+                  setTripType(e.target.value);
+                  setValue('tripProgramTrack', '');
+                  setValue('tripActivities', '');
+                }}
               >
                 <option value="">Select</option>
-                <option value="programs">programs</option>
-                <option value="daily">Daily</option>
+                <option value="programs">برنامج</option>
+                <option value="daily">يوم</option>
               </Form.Select>
               <Form.Control.Feedback type="invalid">
                 {errors.productCategory?.message}
@@ -32,19 +54,41 @@ const ProductType = () => {
           </Col>
           <Col md="12">
             <Form.Group>
-              <Form.Label>Select sub-category:</Form.Label>
+              <Form.Label>
+                صنف الرحلة:
+                <span className="text-danger">*</span>
+              </Form.Label>
               <Form.Select
-                {...register(`productSubCategory`)}
-                isInvalid={!!errors.productSubCategory}
+                value={selectCategory}
+                isInvalid={!!errors.tripCategory}
+                onChange={e => {
+                  setselectCategory(e.target.value);
+                  setValue('tripCategory', e.target.value);
+                  setCustomInput('');
+                }}
               >
                 <option value="">Select</option>
-                <option value="groub">groub</option>
-                <option value="privait">privait</option>
-                <option value="withDriver">withDriver</option>
+                <option value="جماعية">جماعية</option>
+                <option value="خاصة">خاصة</option>
+                <option value="مع سائق">مع سائق</option>
               </Form.Select>
               <Form.Control.Feedback type="invalid">
                 {errors.productSubCategory?.message}
               </Form.Control.Feedback>
+            </Form.Group>
+          </Col>
+          <Col xs="12">
+            <Form.Group>
+              <Form.Control
+                type="text"
+                value={customInput}
+                onChange={e => {
+                  setCustomInput(e.target.value);
+                  setValue('tripCategory', e.target.value);
+                  setselectCategory('');
+                  //handleCustomCategory();
+                }}
+              />
             </Form.Group>
           </Col>
         </Row>
@@ -54,3 +98,6 @@ const ProductType = () => {
 };
 
 export default ProductType;
+ProductType.prototype = {
+  setTripType: PropTypes.func
+};

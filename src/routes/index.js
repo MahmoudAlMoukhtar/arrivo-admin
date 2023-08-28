@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import AuthSimpleLayout from '../layouts/AuthSimpleLayout';
 import MainLayout from '../layouts/MainLayout';
@@ -196,8 +196,13 @@ import QuickLinks from 'components/app/support-desk/quick-links/QuickLinks';
 import Reports from 'components/app/support-desk/reports/Reports';
 import InputMaskExample from 'components/doc-components/InputMaskExample';
 import RangeSlider from 'components/doc-components/RangeSlider';
+import Content from 'components/app/e-commerce/trip-precooked/lists/trip-content/Content';
+import PlacesWillVisit from 'components/app/e-commerce/trip-precooked/lists/places-will-visit/PlacesWillVisit';
+import AccommodationList from 'components/app/e-commerce/trip-precooked/lists/trip-accommodation/AccommodationList';
 
 const FalconRoutes = () => {
+  const [copiedProduct, setCopiedProduct] = useState();
+  const [edit, setEdit] = useState(false);
   return (
     <Routes>
       <Route path="landing" element={<Landing />} />
@@ -310,6 +315,18 @@ const FalconRoutes = () => {
           element={<OrderDetails />}
         />
         <Route path="e-commerce/orders/order-list" element={<Orders />} />
+        <Route
+          path="e-commerce/trip-content/trip-content-list"
+          element={<Content />}
+        />
+        <Route
+          path="e-commerce/trip-accommodation/trip-accommodation-list"
+          element={<AccommodationList />}
+        />
+        <Route
+          path="e-commerce/trip-places/trip-places-list"
+          element={<PlacesWillVisit />}
+        />
         <Route path="e-commerce/invoice" element={<Invoice />} />
         <Route path="e-commerce/billing" element={<Billing />} />
         <Route path="e-commerce/checkout" element={<Checkout />} />
@@ -324,7 +341,17 @@ const FalconRoutes = () => {
           path="e-commerce/product/product-details"
           element={<ProductDetails />}
         />
-        <Route path="e-commerce/product/add-product" element={<AddProduct />} />
+        <Route
+          path="e-commerce/product/add-product"
+          element={
+            <AddProduct
+              edit={edit}
+              setEdit={setEdit}
+              copiedProduct={copiedProduct}
+              setCopiedProduct={setCopiedProduct}
+            />
+          }
+        />
         <Route
           path="e-commerce/product/product-details/:productId"
           element={<ProductDetails />}
@@ -332,7 +359,14 @@ const FalconRoutes = () => {
 
         <Route
           path="e-commerce/product/:productLayout"
-          element={<Products />}
+          element={
+            <Products
+              edit={edit}
+              setEdit={setEdit}
+              copiedProduct={copiedProduct}
+              setCopiedProduct={setCopiedProduct}
+            />
+          }
         />
 
         <Route path="e-commerce/invoice" element={<Invoice />} />

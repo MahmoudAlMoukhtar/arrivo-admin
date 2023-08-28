@@ -13,16 +13,16 @@ const sliderSettings = {
   slidesToScroll: 1
 };
 
-const ProductSingleImage = ({ id, image, name, layout }) => {
+export const ProductSingleImage = ({ id, image, name, layout }) => {
   return (
     <Link
       to={`/e-commerce/product/product-details/${id}`}
       className="d-block h-sm-100"
-      key={image.id}
+      key={id}
     >
       <Image
         rounded={layout === 'list'}
-        src={image.src}
+        src={image}
         className={classNames('h-100 w-100 fit-cover', {
           'rounded-top': layout === 'grid'
         })}
@@ -78,10 +78,11 @@ const ProductImage = ({ name, id, isNew, files, layout }) => {
 
 ProductSingleImage.propTypes = {
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  image: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    src: PropTypes.string.isRequired
-  }),
+  // image: PropTypes.shape({
+  //   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  //   src: PropTypes.string.isRequired
+  // }),
+  image: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   layout: PropTypes.string.isRequired
 };

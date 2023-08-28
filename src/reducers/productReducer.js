@@ -121,6 +121,19 @@ export const productReducer = (state, action) => {
       return {
         ...state
       };
+    case 'ADD_INIT_PRODUCTS':
+      return {
+        ...state,
+        initProducts: payload,
+        products: payload
+      };
+    case 'REMOVE_PRODUCT':
+      return {
+        ...state,
+        products: state.products.filter(
+          product => product.id !== payload.productId
+        )
+      };
     default:
       return state;
   }

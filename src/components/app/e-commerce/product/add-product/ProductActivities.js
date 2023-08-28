@@ -1,66 +1,69 @@
 import React, { useState } from 'react';
 import MultiSelect from 'components/common/MultiSelect';
 import {
+  Button,
   Card,
   Col,
   Form,
-  Row,
-  InputGroup,
   FormControl,
-  Button
+  InputGroup,
+  Row
 } from 'react-bootstrap';
 import { Controller, useFormContext } from 'react-hook-form';
 
-const ProductTags = () => {
-  const {
-    control,
-    formState: { errors },
-    watch
-  } = useFormContext();
-  const tagOptions = [
-    { value: 'camping', label: 'camping' },
-    { value: 'familytrips', label: 'Family trips' },
-    { value: 'soloTrips', label: 'Solo trips' },
-    { value: 'activitiesAndAdventures', label: 'Activities And Adventures' },
-    { value: 'honeyMoon', label: 'Honey moon' }
-  ];
-
+const ProductActivities = () => {
+  const { control } = useFormContext();
   const [tagInput, setTagInput] = useState('');
-  const [selectedTags, setSelectedTags] = useState(watch('tags'));
+  const [selectedActivities, setSelectedActivities] = useState([]);
 
-  const handleAddTag = () => {
-    if (tagInput !== '' && !selectedTags.some(tag => tag.label === tagInput)) {
-      setSelectedTags([...selectedTags, { value: tagInput, label: tagInput }]);
+  const handleAddActivitie = () => {
+    if (
+      tagInput !== '' &&
+      !selectedActivities.some(tag => tag.label === tagInput)
+    ) {
+      setSelectedActivities([
+        ...selectedActivities,
+        { value: tagInput, label: tagInput }
+      ]);
       setTagInput('');
     }
   };
 
+  const activitiesOptions = [
+    { value: 'ركوب الخيل.', label: 'ركوب الخيل.' },
+    { value: 'مدينة الألعاب.', label: 'مدينة الألعاب.' },
+    { value: 'ركوب الدراجات.', label: 'ركوب الدراجات.' },
+    {
+      value: 'الطيران الشراعي ( الباراشوت ).',
+      label: 'الطيران الشراعي ( الباراشوت ).'
+    }
+  ];
+
   return (
     <Card className="mb-3">
       <Card.Header as="h6" className="bg-light">
-        Tags/الهاشتاجات
+        أنشطة الرحلة:
       </Card.Header>
       <Card.Body>
         <Row className="gx-2 gy-3">
           <Col xs="12">
             <Form.Group>
-              <div className="d-flex  flex-column gap-2">
-                <Form.Label>أضف Tag/هاشتاج:</Form.Label>
+              <Form.Label>إضافة أنشطة:</Form.Label>
+              <div className="d-flex flex-column gap-2">
                 <Controller
-                  name="tags"
+                  name="tripActivities"
                   render={({ field, ref }) => (
                     <MultiSelect
                       {...field}
                       ref={ref}
                       closeMenuOnSelect={false}
                       isMulti
-                      options={tagOptions}
+                      options={activitiesOptions}
                       onChange={selectedOptions => {
-                        setSelectedTags(selectedOptions);
+                        setSelectedActivities(selectedOptions);
                         field.onChange(selectedOptions);
                       }}
-                      value={selectedTags}
-                      className={errors.tags ? 'is-invalid' : ''}
+                      value={selectedActivities}
                     />
                   )}
                   control={control}
@@ -68,16 +71,12 @@ const ProductTags = () => {
                 <InputGroup>
                   <div className="d-flex  flex-column gap-2">
                     <FormControl
-                      placeholder="Enter a tag"
+                      placeholder="Enter a Item Content"
                       value={tagInput}
                       onChange={e => setTagInput(e.target.value)}
                     />
-                    <Button
-                      variant="primary"
-                      onClick={handleAddTag}
-                      style={{ width: '100%' }}
-                    >
-                      أضف Tag / هاشتاج
+                    <Button variant="primary" onClick={handleAddActivitie}>
+                      Add Item Content
                     </Button>
                   </div>
                 </InputGroup>
@@ -90,4 +89,4 @@ const ProductTags = () => {
   );
 };
 
-export default ProductTags;
+export default ProductActivities;

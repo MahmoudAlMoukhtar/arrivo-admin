@@ -98,7 +98,7 @@ const Calendar = () => {
   }, []);
 
   return (
-    <>
+    <React.Fragment>
       <Card>
         <Card.Header>
           <Row className="align-items-center gx-0">
@@ -235,7 +235,7 @@ const Calendar = () => {
         setIsOpenEventModal={setIsOpenEventModal}
         modalEventContent={modalEventContent}
       />
-    </>
+    </React.Fragment>
   );
 };
 

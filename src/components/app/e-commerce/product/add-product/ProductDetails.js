@@ -1,19 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, Col, Form, Row } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import TinymceEditor from 'components/common/TinymceEditor';
+//import TinymceEditor from 'components/common/TinymceEditor';
 //import CustomDateInput from 'components/common/CustomDateInput';
 
 const ProductDetails = () => {
   const {
     register,
-    setValue,
     formState: { errors }
   } = useFormContext();
-  const [formData, setFormData] = useState({
-    releaseDate: null,
-    endDate: null
-  });
+  // const [formData, setFormData] = useState({
+  //   releaseDate: null,
+  //   endDate: null
+  // });
 
   // const handleChange = (name, value) => {
   //   setFormData({
@@ -25,11 +24,11 @@ const ProductDetails = () => {
   return (
     <Card className="mb-3">
       <Card.Header as="h6" className="bg-light">
-        Details
+        الوجهة السياحية
       </Card.Header>
       <Card.Body>
         <Row className="gx-2 gy-3">
-          <Col xs="12">
+          {/* <Col xs="12">
             <Form.Group>
               <Form.Label>Trip description:</Form.Label>
               <div className="create-product-description-textarea">
@@ -41,10 +40,12 @@ const ProductDetails = () => {
                 />
               </div>
             </Form.Group>
-          </Col>
-          <Col md="6">
+          </Col> */}
+          {/*      <Col md="6">
             <Form.Group>
-              <Form.Label>Import Status:</Form.Label>
+              <Form.Label>
+                Import Status:<span className="text-danger">*</span>
+              </Form.Label>
               <Form.Select
                 {...register(`importStatus`)}
                 isInvalid={!!errors.importStatus}
@@ -59,10 +60,12 @@ const ProductDetails = () => {
                 {errors.importStatus?.message}
               </Form.Control.Feedback>
             </Form.Group>
-          </Col>
-          <Col md="6">
+          </Col> */}
+          <Col md="12">
             <Form.Group>
-              <Form.Label>Country of Origin:</Form.Label>
+              <Form.Label>
+                Country of Origin:<span className="text-danger">*</span>
+              </Form.Label>
               <Form.Select
                 {...register(`countryOrigin`)}
                 isInvalid={!!errors.countryOrigin}
@@ -79,27 +82,6 @@ const ProductDetails = () => {
               <Form.Control.Feedback type="invalid">
                 {errors.countryOrigin?.message}
               </Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-
-          <Col md="12">
-            <Form.Group controlId="warrantyLength">
-              <Form.Label>Warranty Lenght:</Form.Label>
-              <Form.Control
-                type="text"
-                name="warrantyLength"
-                {...register('warrantyLength')}
-              />
-            </Form.Group>
-          </Col>
-          <Col md="12">
-            <Form.Group controlId="warrantyPolicy">
-              <Form.Label>Warranty Policy:</Form.Label>
-              <Form.Control
-                type="text"
-                name="warrantyPolicy"
-                {...register('warrantyPolicy')}
-              />
             </Form.Group>
           </Col>
         </Row>

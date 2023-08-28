@@ -35,7 +35,7 @@ const ProductUpload = () => {
   return (
     <Card className="mb-3">
       <Card.Header as="h6" className="bg-light">
-        Add images
+        إضافة صور الرحلة <span className="text-danger">*</span>
       </Card.Header>
       <Card.Body>
         <div {...getRootProps({ className: 'dropzone-area py-6' })}>
